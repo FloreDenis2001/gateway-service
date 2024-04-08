@@ -2,45 +2,49 @@ spring:
   cloud:
     gateway:
       routes:
-        - id:  command
-          uri: http://localhost:8081
-          predicates:
-            - Path=/command/**
-          filters:
-            - RewritePath=/(?<segment>.*), /api/v1/$\{segment}
-        - id: query
-          uri: http://localhost:8082
-          predicates:
-            - Path=/query/**
-          filters:
-            - RewritePath=/(?<segment>.*), /api/v1/$\{segment}
         - id: nserver
           uri: http://localhost:8080
           predicates:
             - Path=/server/**
           filters:
-            - RewritePath=/(?<segment>.*), /api/v1/$\{segment}
-    globalcors:
-      corsConfigurations:
-        '[/**]': # Applies CORS configuration to all routes
-          allowedOrigins:
-            - "http://localhost:3000"
-            - "http://34.247.255.42:3000"
-          allowedMethods:
-            - GET
-            - POST
-            - PUT
-            - DELETE
-            - OPTIONS
-          allowedHeaders:
-            - Content-Type
-            - Authorization
-            - X-Requested-With
-            - Accept
-            - Origin
-          allowCredentials: true
-          maxAge: 3600
-
+            - RewritePath=/server/(?<segment>.*), /api/v1/$\{segment}
+      globalcors:
+        corsConfigurations:
+          '[/]':
+            allowedOrigins:
+              - http://localhost:3000
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - Content-Type
+              - Authorization
+              - X-Requested-With
+              - Accept
+              - Origin
+            allowCredentials: true
+            maxAge: 3600
 
   application:
     name: gateway
+
+server:
+  port: 5000
+
+management:
+  endpoint:
+    health:
+      show-details: ALWAYS
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    root: DEBUG
+    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: INFO
+    org.springframework.cloud.gateway: TRACE
